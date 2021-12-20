@@ -1,34 +1,21 @@
-node {
- 	// Clean workspace before doing anything
-    deleteDir()
-
-    try {
-        stage ('Clone') {
-        	checkout scm
+pipeline {
+    agent any
+    stages{
+        stage('git-checkout') {
+            agent any
+            steps {
+                git branch: 'master', url: 'https://github.com/jalogut/jenkinsfile-basic-sample.git'
+            }
         }
-        stage ('Build') {
-        	sh "echo 'shell scripts to build project...'"
-        }
-        stage ('Tests') {
-	        parallel 'static': {
-	            sh "echo 'shell scripts to run static tests...'"
-	        },
-	        'unit': {
-	            sh "echo 'shell scripts to run unit tests...'"
-	        },
-	        'integration': {
-	            sh "echo 'shell scripts to run integration tests...'"
-	        }
-        }
-      	stage ('Deploy') {
-            sh "echo 'shell scripts to deploy to server...'"
-      	}
-    } catch (err) {
-        currentBuild.result = 'FAILED'
-        throw err
+        stage('list-objects') {
+            agent any
+            steps {
+                sh '''#!/bin/bash
+            
+                    ls -ltrt
+                    pwd
+                '''
+            }
+         }
     }
 }
-
-
-
-
